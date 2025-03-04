@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: new-instance
+    name: benesse.jp/kyouiku/
     env: python
     region: Oregon
     plan: free
