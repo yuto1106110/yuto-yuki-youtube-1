@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: benesse.jp/kyouiku/
+    name: gakkenonair.gakken
     env: python
     region: Oregon
     plan: free
