@@ -1,8 +1,9 @@
 name: Deploy
-on:
+on:e
   push:
     branches:
-      - main
+    - main
+    - relean/*
 jobs:
   deploy:
     runs-on: ubuntu-latest
