@@ -1,0 +1,2 @@
+$ mkdir -p .github/workflows
+$ vim .github/workflows/deploy.yml
