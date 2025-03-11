@@ -566,6 +566,12 @@ def toggleVideoCheck():
     global invidious_api
     invidious_api.check_video = not invidious_api.check_video
     return f'{not invidious_api.check_video} to {invidious_api.check_video}'
+@app.get("/shadow", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+return template("shadow.html", {"request": request})
+@app.get("/rammerhead", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+return template("rammerhead.html", {"request": request})
 
 
 @app.exception_handler(500)
@@ -579,9 +585,3 @@ def apiWait(request: Request, exception: APITimeoutError):
 @app.exception_handler(UnallowedBot)
 def returnToUnallowedBot(request: Request, exception: UnallowedBot):
     return template("error.html", {"request": request, "context": '403 Forbidden'}, status_code=403)
-@app.get("/shadow", response_class=HTMLResponse)
-def list_page(response: Response, request: Request):
-return template("shadow.html", {"request": request})
-@app.get("/rammerhead", response_class=HTMLResponse)
-def list_page(response: Response, request: Request):
-return template("rammerhead.html", {"request": request})
