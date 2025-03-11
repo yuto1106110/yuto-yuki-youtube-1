@@ -20,6 +20,14 @@
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
     <body class="no-theme">
+<button id="shadow">shadow</button>
+<button id="rammerhead">rammerhead</button>
+document.getElementById('shadow').onclick = function() {
+window.location.href = '/rammerhead';
+};
+document.getElementById('rammerhead').onclick = function() {
+window.location.href = '/shadow';
+};
         <div id="search-widget" class="pure-g h-box">
             
             <div id="logo" class="pure-u-1">
