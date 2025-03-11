@@ -19,21 +19,15 @@
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
-    <body class="no-theme">
-<button id="shadow">shadow</button>
-<button id="rammerhead">rammerhead</button>
-document.getElementById('shadow').onclick = function() {
-window.location.href = '/rammerhead';
-};
-document.getElementById('rammerhead').onclick = function() {
-window.location.href = '/shadow';
-};
         <div id="search-widget" class="pure-g h-box">
             
             <div id="logo" class="pure-u-1">
                 <h1 href="javascript:location.replace('/')" class="pure-menu-heading">Yuto Yuki-YouTube</h1>
                 <a href="javascript:location.replace('/bbs')">掲示板 </a>
-            </div>
+               <body class="no-theme">
+<button id="shadow">shadow</button>
+<button id="rammerhead">rammerhead</button>
+	    </div>
             
             <div class="pure-u-1-4"></div>
             
@@ -62,6 +56,33 @@ window.location.href = '/shadow';
                 },delay:300
             });
         </script>
+	   let isProxyMode = false;
+        const canvas = document.getElementById('sandstormCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        function drawSandstorm() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(222, 184, 135, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 5 + 1;
+                ctx.fillStyle = 'rgba(222, 184, 135, 0.1)';
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+	document.getElementById('shadow').onclick = function() {
+window.location.href = '/shadow';
+};
+document.getElementById('rammerhead').onclick = function() {
+window.location.href = '/rammerhead';
+};
 	</div>
        <script src="//accaii.com/yuto110/script.js" async></script><noscript><img src="//accaii.com/yuto110/script?guid=on"></noscript>
     <!--shinobi1--><script type="text/javascript" src="//xa.shinobi.jp/ufo/191889900"></script><noscript><a href="//xa.shinobi.jp/bin/gg?191889900" target="_blank"><img src="//xa.shinobi.jp/bin/ll?191889900" border="0"></a><br><span style="font-size:9px"><img style="margin:0;vertical-align:text-bottom;" src="//img.shinobi.jp/tadaima/fj.gif" width="19" height="11"> </span></noscript><!--shinobi2-->
