@@ -574,6 +574,9 @@ def list_page(response: Response, request: Request):
 @app.get("/rammerhead", response_class=HTMLResponse)
 def list_page(response: Response, request: Request):
     return template("rammerhead.html", {"request": request})
+@app.get("/chat", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    return template("chat.html", {"request": request})
 
 
 @app.exception_handler(500)
