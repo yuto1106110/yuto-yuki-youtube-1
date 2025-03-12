@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="/css/grids-responsive-min.css">
         <link rel="stylesheet" href="/css/ionicons.min.css">
         <link rel="stylesheet" href="/css/default.css">
+	<link rel="stylesheet" href="/css/menu.css">
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"/>
         
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -22,10 +23,21 @@
             
             <div id="logo" class="pure-u-1">
                 <h1 href="javascript:location.replace('/')" class="pure-menu-heading">Yuto Yuki-YouTube</h1>
-                <a href="javascript:location.replace('/bbs')">掲示板 </a>
-               <body class="no-theme">
-		       <button onclick="location.replace('/shadow')">shadow</button>
-		       <button onclick="location.replace('/rammerhead')">rammerhead</button>
+             <div class="header"></div>
+<input type="checkbox" class="openSidebarMenu" id="openSidebarMenu">
+<label for="openSidebarMenu" class="sidebarIconToggle">
+    <div class="spinner diagonal part-1"></div>
+    <div class="spinner horizontal"></div>
+    <div class="spinner diagonal part-2"></div>
+  </label>
+<div id="sidebarMenu">
+	<ul class="sidebarMenuInner">
+		<li>~Menu~
+		<li><a href="javascript:location.replace('/bbs')">Yuki BBS</a></li>
+		<li><a href="location.replace('/rammerhead')">rammerhead</a></li>
+		<li><a href="location.replace('/shadow')">shadow</a></li>
+	</ul>
+</div>
 	    </div>
             
             <div class="pure-u-1-4"></div>
