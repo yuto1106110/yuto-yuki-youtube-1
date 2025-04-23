@@ -7,297 +7,546 @@ import random
 import os
 import subprocess
 from cache import cache
-import ast
 
-# 3 => (3.0, 1.5) => (1.5, 1)
-max_api_wait_time = (1.5, 1)
-# 10 => 10
-max_time = 10
 
-user_agents = [
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3864.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:67.0) Gecko/20100101 Firefox/67.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:68.0) Gecko/20100101 Firefox/68.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:61.0) Gecko/20100101 Firefox/61.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:92.0) Gecko/20100101 Firefox/92.0',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36 Edge/17.17134',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15',
-  'Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1'
+max_api_wait_time = 8
+max_time = 12
+apis = [
+    r"https://invidious.jing.rocks/",
+    r"https://invidious.nerdvpn.de/",
+    r"https://inv.nadeko.net/",
+    r"https://invidious.jing.rocks/",
+r"https://inv.vern.cc/",
+r"https://inv.zzls.xyz/",
+r"https://invi.susurrando.com/",
+r"https://invidious.epicsite.xyz/",
+r"https://invidious.esmailelbob.xyz/",
+r"https://invidious.garudalinux.org/",
+r"https://invidious.kavin.rocks/",
+r"https://invidious.lidarshield.cloud/",
+r"https://invidious.lunar.icu/",
+r"https://yt-us.discard.no/",
+r"https://invidious.nerdvpn.de/",
+r"https://invidious.privacydev.net/",
+r"https://invidious.sethforprivacy.com/",
+r"https://invidious.slipfox.xyz/",
+r"https://yt-no.discard.no/",
+r"https://invidious.snopyta.org/",
+r"https://invidious.tiekoetter.com/",
+r"https://invidious.vpsburti.com/",
+r"https://invidious.weblibre.org/",
+r"https://invidious.pufe.org/",
+r"https://iv.ggtyler.dev/",
+r"https://iv.melmac.space/",
+r"https://vid.puffyan.us/",
+r"https://watch.thekitty.zone/",
+r"https://yewtu.be/",
+r"https://youtube.moe.ngo/",
+r"https://yt.31337.one/",
+r"https://yt.funami.tech/",
+r"https://yt.oelrichsgarcia.de/",
+r"https://yt.wkwkwk.fun/",
+r"https://youtube.076.ne.jp/",
+r"https://invidious.projectsegfau.lt/",
+r"https://invidious.fdn.fr/",
+r"https://i.oyster.men/",
+r"https://invidious.domain.glass/",
+r"https://inv.skrep.eu/",
+r"https://clips.im.allmendenetz.de/",
+r"https://ytb.trom.tf/",
+r"https://invidious.pcgamingfreaks.at/",
+r"https://youtube.notrack.ch/",
+r"https://iv.ok0.org/",
+r"https://youtube.vpn-home-net.de/",
+r"http://144.126.251.186/",
+r"https://invidious.citizen4.eu/",
+r"https://yt.sebaorrego.net/",
+r"https://invidious.pesso.al/",
+r"https://invidious.manasiwibi.com/",
+r"https://toob.unternet.org/",
+r"https://youtube.mosesmang.com/",
+r"https://invidious.varishangout.net/",
+r"https://invidio.xamh.de/",
+r"https://yt.tesaguri.club/",
+r"https://video.francevpn.fr/",
+r"https://inv.in.projectsegfau.lt/",
+r"https://invid.nevaforget.de/",
+r"https://tube.foss.wtf/",
+r"https://invidious.777.tf/",
+r"https://inv.tux.pizza/",
+r"https://youtube.076.ne.jp",
+r"https://invidious.osi.kr/",
+r"https://inv.riverside.rocks/",
+r"https://inv.bp.mutahar.rocks/",
+r"https://invidious.namazso.eu/",
+r"https://tube.cthd.icu/",
+r"https://invidious.snopyta.org/",
+r"https://yewtu.be/",
+r"https://invidious.privacy.gd/",
+r"https://invidious.lunar.icu/",
+r"https://vid.puffyan.us/",
+r"https://invidious.weblibre.org/",
+r"https://invidious.esmailelbob.xyz/",
+r"https://invidio.xamh.de/",
+r"https://invidious.kavin.rocks/",
+r"https://invidious-us.kavin.rocks/",
+r"https://invidious.mutahar.rocks/",
+r"https://invidious.zee.li/",
+r"https://tube.connect.cafe/",
+r"https://invidious.zapashcanon.fr/",
+r"https://invidious.poast.org/",
+r"https://ytb.trom.tf/",
+r"https://invidious.froth.zone/",
+r"https://invidious.domain.glass/",
+r"https://invidious.sp-codes.de/",
+r"http://144.126.251.186/",
+r"https://yt.512mb.org/",
+r"https://invidious.fdn.fr/",
+r"https://invidious.pcgamingfreaks.at/",
+r"https://tube.meowz.moe/",
+r"https://clips.im.allmendenetz.de/",
+r"https://inv.skrep.eu/",
+r"https://invidious.frbin.com/",
+r"https://dev.invidio.us/",
+r"https://invidious.site/",
+r"https://invidious.sethforprivacy.com/",
+r"https://invidious.stemy.me/",
+r"https://betamax.cybre.club/",
+r"https://invidious.com/",
+r"https://invidious.snopyta.org",
+r"https://yewtu.be",
+r"https://invidious.kavin.rocks",
+r"https://vid.puffyan.us",
+r"https://inv.riverside.rocks",
+r"https://invidious.not.futbol/",
+r"https://youtube.076.ne.jp",
+r"https://yt.artemislena.eu",
+r"https://invidious.esmailelbob.xyz",
+r"https://invidious.projectsegfau.lt",
+r"https://invidious.dhusch.de/",
+r"https://inv.odyssey346.dev/"
 ]
-
-def getRandomUserAgent():
-  user_agent = user_agents[random.randint(0, len(user_agents) - 1)]
-  print(user_agent)
-  return {
-    'User-Agent': user_agent
-  }
-
-class InvidiousAPI:
-    def __init__(self):
-        self.all = ast.literal_eval(requests.get('https://raw.githubusercontent.com/yuto1106110/yuto-yuki-youtube-1/main/APItati', headers=getRandomUserAgent(), timeout=(1.0, 0.5)).text)
-        
-        self.video = self.all['video']
-        self.playlist = self.all['playlist']
-        self.search = self.all['search']
-        self.channel = self.all['channel']
-        self.comments = self.all['comments']
-
-        self.check_video = False
-
-    def info(self):
-        return {
-            'API': self.all,
-            'checkVideo': self.check_video
-        }
-
-        
-invidious_api = InvidiousAPI()
-
-url = requests.get('https://raw.githubusercontent.com/LunaKamituki/Yuki-BBS-Server-URL/refs/heads/main/server.txt', headers=getRandomUserAgent()).text.rstrip()
-
+url = requests.get(r'https://raw.githubusercontent.com/mochidukiyukimi/yuki-youtube-instance/main/instance.txt').text.rstrip()
 version = "1.0"
-new_instance_version = "1.3.2"
-
 
 os.system("chmod 777 ./yukiverify")
 
-class APITimeoutError(Exception):
+# APIリストのコピーを生成
+apichannels = apis.copy()
+apicomments = apis.copy()
+
+# 例外クラスの定義
+class APItimeoutError(Exception):
     pass
 
-class UnallowedBot(Exception):
-    pass
-
-def isJSON(json_str):
+# JSON判定
+def is_json(json_str):
     try:
         json.loads(json_str)
         return True
-    except json.JSONDecodeError as jde:
-        pass
-    return False
+    except json.JSONDecodeError:
+        return False
 
-def updateList(list, str):
-    list.append(str)
-    list.remove(str)
-    return list
-
-def requestAPI(path, api_urls):
+# 汎用リクエスト
+def apirequest(url):
+    global apis
     starttime = time.time()
-    
-    for api in api_urls:
-        if  time.time() - starttime >= max_time - 1:
+    for api in apis:
+        if time.time() - starttime >= max_time - 1:
             break
-            
         try:
-            print(api + 'api/v1' + path)
-            res = requests.get(api + 'api/v1' + path, headers=getRandomUserAgent(), timeout=max_api_wait_time)
-            if res.status_code == requests.codes.ok and isJSON(res.text):
-                
-                if invidious_api.check_video and path.startswith('/video/'):
-                    # 動画の有無をチェックする場合
-                    video_res = requests.get(json.loads(res.text)['formatStreams'][0]['url'], headers=getRandomUserAgent(), timeout=(3.0, 0.5))
-                    if not 'video' in video_res.headers['Content-Type']:
-                        print(f"No Video(True)({video_res.headers['Content-Type']}): {api}")
-                        updateList(api_urls, api)
-                        continue
-
-                if path.startswith('/channel/') and json.loads(res.text)["latestvideo"] == []:
-                    print(f"No Channel: {api}")
-                    updateList(api_urls, api)
-                    continue
-
-                print(f"Success({invidious_api.check_video})({path.split('/')[1].split('?')[0]}): {api}")
+            res = requests.get(api + url, timeout=max_api_wait_time)
+            if res.status_code == 200 and is_json(res.text):
+                print(f"その他成功したAPI: {api}")  # 成功したAPIをログに出力
                 return res.text
-
-            elif isJSON(res.text):
-                # ステータスコードが200ではないかつ内容がJSON形式の場合
-                print(f"Returned Err0r(JSON): {api} ('{json.loads(res.text)['error'].replace('error', 'err0r')}')")
-                updateList(api_urls, api)
             else:
-                # ステータスコードが200ではないかつ内容がJSON形式ではない場合
-                print(f"Returned Err0r: {api} ('{res.text[:100]}')")
-                updateList(api_urls, api)
+                print(f"その他エラー: {api}")
+                apis.append(api)
+                apis.remove(api)
         except:
-            # 例外等が発生した場合
-            print(f"Err0r: {api}")
-            updateList(api_urls, api)
-    
-    raise APITimeoutError("APIがタイムアウトしました")
+            print(f"その他タイムアウト: {api}")
+            apis.append(api)
+            apis.remove(api)
+    raise APItimeoutError("APIがタイムアウトしました")
+
+# チャンネル用のリクエスト
+def apichannelrequest(url):
+    global apichannels
+    starttime = time.time()
+    for api in apichannels:
+        if time.time() - starttime >= max_time - 1:
+            break
+        try:
+            res = requests.get(api + url, timeout=max_api_wait_time)
+            if res.status_code == 200 and is_json(res.text):
+                print(f"チャンネル成功したAPI: {api}")  # 成功したAPIをログに出力
+                return res.text
+            else:
+                print(f"チャンネルエラー: {api}")
+                apichannels.append(api)
+                apichannels.remove(api)
+        except:
+            print(f"チャンネルタイムアウト: {api}")
+            apichannels.append(api)
+            apichannels.remove(api)
+    raise APItimeoutError("APIがタイムアウトしました")
+
+# コメント用のリクエスト
+def apicommentsrequest(url):
+    global apicomments
+    starttime = time.time()
+    for api in apicomments:
+        if time.time() - starttime >= max_time - 1:
+            break
+        try:
+            res = requests.get(api + url, timeout=max_api_wait_time)
+            if res.status_code == 200 and is_json(res.text):
+                print(f"コメント成功したAPI: {api}")  # 成功したAPIをログに出力
+                return res.text
+            else:
+                print(f"コメントエラー: {api}")
+                apicomments.append(api)
+                apicomments.remove(api)
+        except:
+            print(f"コメントタイムアウト: {api}")
+            apicomments.append(api)
+            apicomments.remove(api)
+    raise APItimeoutError("APIがタイムアウトしました")
 
 
-def getInfo(request):
-    return json.dumps([version, os.environ.get('RENDER_EXTERNAL_URL'), str(request.scope["headers"]), str(request.scope['router'])[39:-2]])
 
-failed = "Load Failed"
+video_apis = [
+    r"https://invidious.jing.rocks/",
+    r"https://invidious.nerdvpn.de/",
+    r"https://script.google.com/macros/s/AKfycbxic9NV_JbKs1Ia4m5yw6z7nAZjkQ0mjZ2FGi29ZtLMhX9R6JSEO6jZBuXpNyWHCuRy/exec?videoId=",
+    r"https://script.google.com/macros/s/AKfycbzDTu2EJQrGPPU-YS3EFarXbfh9zGB1zR9ky-9AunHl7Yp3Gq83rh1726JYjxbjbEsB/exec?videoId=",
+    r"https://script.google.com/macros/s/AKfycbw43HTKJe0khOM3h5lrRbWw2OUONcbQCsnSry7F6c_1bPdtxVjTUotm1_XY2KfqMLWT/exec?videoId=",
+    r"https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=",
+]
 
-def getVideoData(videoid):
-    t = json.loads(requestAPI(f"/videos/{urllib.parse.quote(videoid)}", invidious_api.video))
+max_time = 30  # 最大待機時間の設定
+max_api_wait_time = 5  # APIリクエストの最大待機時間
 
-    if 'recommendedvideo' in t:
-        recommended_videos = t["recommendedvideo"]
-    elif 'recommendedVideos' in t:
-        recommended_videos = t["recommendedVideos"]
-    else:
-        recommended_videos = {
-            "videoId": failed,
-            "title": failed,
-            "authorId": failed,
-            "author": failed,
-            "lengthSeconds": 0,
-            "viewCountText": "Load Failed"
-        }
+class APItimeoutError(Exception):
+    pass
 
-    return [
+def is_json(myjson):
+    try:
+        json_object = json.loads(myjson)
+    except ValueError as e:
+        return False
+    return True
+
+# APIリクエスト関数
+def apirequest_video(url):
+    global video_apis
+    starttime = time.time()
+    for api in video_apis:
+        if time.time() - starttime >= max_time - 1:
+            break
+        try:
+            res = requests.get(api + url, timeout=max_api_wait_time)
+            if res.status_code == 200 and is_json(res.text):
+                print(f"動画API成功: {api}")  # 成功したAPIをログに出力
+                return res.text
+            else:
+                print(f"エラー: {api}")
+                video_apis.append(api)
+                video_apis.remove(api)
+        except:
+            print(f"タイムアウト: {api}")
+            video_apis.append(api)
+            video_apis.remove(api)
+    raise APItimeoutError("動画APIがタイムアウトしました")
+
+def get_data(videoid):
+    global logs
+    try:
+        # 最初に既存の方法でデータを取得しようとする
+        t = json.loads(apirequest(r"api/v1/videos/" + urllib.parse.quote(videoid)))
+    except (APItimeoutError, json.JSONDecodeError) as e:
+        print(f"データ取得に失敗しました: {e}")
+        # 失敗したときには代替の方法を使用する
+        return getting_data(videoid)
+
+    # 関連動画を解析してリストにする
+    related_videos = [
         {
-            'video_urls': list(reversed([i["url"] for i in t["formatStreams"]]))[:2],
-            'description_html': t["descriptionHtml"].replace("\n", "<br>"),
-            'title': t["title"],
-            'length_text': str(datetime.timedelta(seconds=t["lengthSeconds"])),
-            'author_id': t["authorId"],
-            'author': t["author"],
-            'author_thumbnails_url': t["authorThumbnails"][-1]["url"],
-            'view_count': t["viewCount"],
-            'like_count': t["likeCount"],
-            'subscribers_count': t["subCountText"]
-        },
-        [
-            {
-                "video_id": i["videoId"],
-                "title": i["title"],
-                "author_id": i["authorId"],
-                "author": i["author"],
-                "length_text": str(datetime.timedelta(seconds=i["lengthSeconds"])),
-                "view_count_text": i["viewCountText"]
-            } for i in recommended_videos
-        ]
+            "id": i["videoId"],
+            "title": i["title"],
+            "authorId": i["authorId"],
+            "author": i["author"],
+            "viewCount": i["viewCount"]
+        }
+        for i in t["recommendedVideos"]
     ]
 
-def getSearchData(q, page):
+    return (
+        related_videos,  
+        list(reversed([i["url"] for i in t["formatStreams"]]))[:2],  
+        t["descriptionHtml"].replace("\n", "<br>"),  
+        t["title"],  
+        t["authorId"],  
+        t["author"],  
+        t["authorThumbnails"][-1]["url"],  
+        t["viewCount"]  
+    )
 
-    def formatSearchData(data_dict):
-        if data_dict["type"] == "video":
-            return {
-                "type": "video",
-                "title": data_dict["title"] if 'title' in data_dict else failed,
-                "id": data_dict["videoId"] if 'videoId' in data_dict else failed,
-                "authorId": data_dict["authorId"] if 'authorId' in data_dict else failed,
-                "author": data_dict["author"] if 'author' in data_dict else failed,
-                "published": data_dict["publishedText"] if 'publishedText' in data_dict else failed,
-                "length": str(datetime.timedelta(seconds=data_dict["lengthSeconds"])),
-                "view_count_text": data_dict["viewCountText"]
-            }
+def getting_data(videoid):
+    urls = [
+        f"https://just-frequent-network.glitch.me/api/{urllib.parse.quote(videoid)}",
+        f"https://amenable-charm-lute.glitch.me/api/login/{urllib.parse.quote(videoid)}",
+        f"https://free-sudden-kiss.glitch.me/api/login/{urllib.parse.quote(videoid)}",
+        f"https://wtserver1.glitch.me/api/login/{urllib.parse.quote(videoid)}",
+        f"https://wataamee.glitch.me/api/{urllib.parse.quote(videoid)}",
+        f"https://natural-voltaic-titanium.glitch.me/api/login/{urllib.parse.quote(videoid)}",
+        f"https://jade-highfalutin-account.glitch.me/api/login/{urllib.parse.quote(videoid)}",
+        f"https://watawatawata.glitch.me/api/login/{urllib.parse.quote(videoid)}"
+    ]
+    
+    for url in urls:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                t = response.json()
+                
+                # 推奨動画情報の取得
+                recommended_videos = [{
+                    "id": t["videoId"],
+                    "title": t["videoTitle"],
+                    "authorId": t["channelId"],
+                    "author": t["channelName"],
+                    "viewCountText": f"{t['videoViews']} views"
+                }]
+                
+                # ストリームURLや他の情報を取得
+                stream_url = t.get("stream_url", "")
+                description = t.get("videoDes", "").replace("\n", "<br>")
+                title = t.get("videoTitle", "")
+                authorId = t.get("channelId", "")
+                author = t.get("channelName", "")
+                author_icon = t.get("channelImage", "")
+                
+                return recommended_videos, stream_url, description, title, authorId, author, author_icon
             
-        elif data_dict["type"] == "playlist":
-            return {
-                    "type": "playlist",
-                    "title": data_dict["title"] if 'title' in data_dict else failed,
-                    "id": data_dict['playlistId'] if 'playlistId' in data_dict else failed,
-                    "thumbnail": data_dict["playlistThumbnail"] if 'playlistThumbnail' in data_dict else failed,
-                    "count": data_dict["videoCount"] if 'videoCount' in data_dict else failed
-                }
+        except Exception as e:
+            print(f"{url} からのデータ取得中にエラーが発生しました: {e}")
+
+def get2_data(videoid):
+    urls = [
+        f"https://test-blank-page.glitch.me/api/server/v1/{urllib.parse.quote(videoid)}",
+        f"https://test-blank-page.glitch.me/api/server/v2/{urllib.parse.quote(videoid)}",
+        f"https://test-blank-page.glitch.me/api/server/v3/{urllib.parse.quote(videoid)}",
+        f"https://test-blank-page.glitch.me/api/server/v4/{urllib.parse.quote(videoid)}",
+        f"https://test-blank-page.glitch.me/api/server/v5/{urllib.parse.quote(videoid)}",
+        f"https://test-blank-page.glitch.me/api/server/v7/{urllib.parse.quote(videoid)}"
+    ]
+    
+    for url in urls:
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                t = response.json()
+                
+                # ストリームURLや動画情報を取得
+                stream_url = t.get("stream_url", "")
+                description = t.get("videoDes", "").replace("\n", "<br>")
+                title = t.get("videoTitle", "")
+                authorId = t.get("channelId", "")
+                author = t.get("channelName", "")
+                author_icon = t.get("channelImage", "")
+                
+                return stream_url, description, title, authorId, author, author_icon
             
-        elif data_dict["authorThumbnails"][-1]["url"].startswith("https"):
-            return {
-                "type": "channel",
-                "author": data_dict["author"] if 'author' in data_dict else failed,
-                "id": data_dict["authorId"] if 'authorId' in data_dict else failed,
-                "thumbnail": data_dict["authorThumbnails"][-1]["url"] if 'authorThumbnails' in data_dict and len(data_dict["authorThumbnails"]) and 'url' in data_dict["authorThumbnails"][-1] else failed
-            }
-        else:
-            return {
-                "type": "channel",
-                "author": data_dict["author"] if 'author' in data_dict else failed,
-                "id": data_dict["authorId"] if 'authorId' in data_dict else failed,
-                "thumbnail": "https://" + data_dict['authorThumbnails'][-1]['url']
-            }
+        except Exception as e:
+            print(f"{url} からのデータ取得中にエラーが発生しました: {e}")
 
-    # "datas"というのは気持ち悪いかもしれないが、複数のデータが入っていると明示できるという
-    # メリットの方がコードを書く上では大きい
-    datas_dict = json.loads(requestAPI(f"/search?q={urllib.parse.quote(q)}&page={page}&hl=jp", invidious_api.search))
-    return [formatSearchData(data_dict) for data_dict in datas_dict]
-
-
-def getChannelData(channelid):
-    t = json.loads(requestAPI(f"/channels/{urllib.parse.quote(channelid)}", invidious_api.channel))
-    if 'latestvideo' in t:
-        latest_videos = t['latestvideo']
-    elif 'latestVideos' in t:
-        latest_videos = t['latestVideos']
+def load_search(i):
+    # 動画情報の取得
+    if i["type"] == "video":
+        return {
+            "title": i["title"] if 'title' in i else 'Load Failed',
+            "id": i["videoId"] if 'videoId' in i else 'Load Failed',
+            "authorId": i["authorId"] if 'authorId' in i else 'Load Failed',
+            "author": i["author"] if 'author' in i else 'Load Failed',
+            "length": str(datetime.timedelta(seconds=i["lengthSeconds"])),
+            "published": i["publishedText"] if 'publishedText' in i else 'Load Failed',
+            "type": "video"
+        }
+    
+    # プレイリスト情報の取得
+    elif i["type"] == "playlist":
+        return {
+            "title": i["title"] if 'title' in i else "Load Failed",
+            "id": i['videoId'] if 'videoId' in i else "Load Failed",
+            "thumbnail": i["videos"][0]["videoId"] if 'videos' in i and len(i["videos"]) and 'videoId' in i['videos'][0] else "Load Failed",
+            "count": i["videoCount"] if 'videoCount' in i else "Load Failed",
+            "type": "playlist"
+        }
+    
+    # チャンネル情報の取得
+    elif 'authorThumbnails' in i and len(i["authorThumbnails"]) > 0 and i["authorThumbnails"][-1]["url"].startswith("https"):
+        return {
+            "author": i["author"] if 'author' in i else 'Load Failed',
+            "id": i["authorId"] if 'authorId' in i else 'Load Failed',
+            "thumbnail": i["authorThumbnails"][-1]["url"] if 'authorThumbnails' in i and len(i["authorThumbnails"]) and 'url' in i["authorThumbnails"][-1] else 'Load Failed',
+            "type": "channel"
+        }
     else:
-        latest_videos = {
-            "title": failed,
-            "videoId": failed,
-            "authorId": failed,
-            "author": failed,
-            "publishedText": failed,
-            "viewCountText": "0",
-            "lengthSeconds": "0"
+        return {
+            "author": i["author"] if 'author' in i else 'Load Failed',
+            "id": i["authorId"] if 'authorId' in i else 'Load Failed',
+            "thumbnail": f"https://{i['authorThumbnails'][-1]['url']}",
+            "type": "channel"
         }
     
+def get_channel(channelid):
+    t = json.loads(apirequest(f"/channels/{urllib.parse.quote(channelid)}", invidious_api.channels))
+    if not t["latestVideos"]:
+        print("APIがチャンネルを返しませんでした")
+        apichannels = updateList(apichannels, apichannels[0])
+        raise APItimeoutError("APIがチャンネルを返しませんでした")
     
-    return [
-        [
-            {
-                # 直近の動画
-                "type":"video",
-                "title": i["title"],
-                "id": i["videoId"],
-                "authorId": t["authorId"],
-                "author": t["author"],
-                "published": i["publishedText"],
-                "view_count_text": i['viewCountText'],
-                "length_str": str(datetime.timedelta(seconds=i["lengthSeconds"]))
-            } for i in latest_videos
-        ], {
-            # チャンネル情報
-            "channel_name": t["author"],
-            "channel_icon": t["authorThumbnails"][-1]["url"],
-            "channel_profile": t["descriptionHtml"],
-            "author_banner": urllib.parse.quote(t["authorBanners"][0]["url"], safe="-_.~/:") if 'authorBanners' in t and len(t['authorBanners']) else '',
-            "subscribers_count": t["subCount"],
-            "tags": t["tags"]
-        }
-    ]
+    return [[{"title": i["title"], "id": i["videoId"], "authorId": t["authorId"], "author": t["author"], "published": i["publishedText"], "type":"video"} for i in t["latestVideos"]],
+            {"channelname": t["author"], "channelicon": t["authorThumbnails"][-1]["url"], "channelprofile": t["descriptionHtml"]}]
 
-def getPlaylistData(listid, page):
-    t = json.loads(requestAPI(f"/playlists/{urllib.parse.quote(listid)}?page={urllib.parse.quote(page)}", invidious_api.playlist))["videos"]
+def get_playlist(listid, page):
+    t = json.loads(apirequest(f"/playlists/{urllib.parse.quote(listid)}?page={urllib.parse.quote(page)}", invidious_api.videos))["videos"]
     return [{"title": i["title"], "id": i["videoId"], "authorId": i["authorId"], "author": i["author"], "type": "video"} for i in t]
 
-def getCommentsData(videoid):
-    t = json.loads(requestAPI(f"/comments/{urllib.parse.quote(videoid)}?hl=jp", invidious_api.comments))["comments"]
+def get_comments(videoid):
+    t = json.loads(apirequest(f"/comments/{urllib.parse.quote(videoid)}?hl=jp", invidious_api.comments))["comments"]
     return [{"author": i["author"], "authoricon": i["authorThumbnails"][-1]["url"], "authorid": i["authorId"], "body": i["contentHtml"].replace("\n", "<br>")} for i in t]
 
-'''
-使われていないし戻り値も設定されていないためコメントアウト
-def get_replies(videoid, key):
-    t = json.loads(requestAPI(f"/comments/{videoid}?hmac_key={key}&hl=jp&format=html", invidious_api.comments))["contentHtml"]
-'''
+# 動画取得用APIリクエスト関数を作成
+def apirequest_video(url):
+    global video_apis
+    starttime = time.time()
+    for api in video_apis:
+        if time.time() - starttime >= max_time - 1:
+            break
+        try:
+            res = requests.get(api + url, timeout=max_api_wait_time)
+            if res.status_code == 200 and is_json(res.text):
+                print(f"動画API成功: {api}")  # 成功したAPIをログに出力
+                return res.text
+            else:
+                print(f"エラー: {api}")
+                video_apis.append(api)
+                video_apis.remove(api)
+        except:
+            print(f"タイムアウト: {api}")
+            video_apis.append(api)
+            video_apis.remove(api)
+    raise APItimeoutError("動画APIがタイムアウトしました")
 
 
-def checkCookie(cookie):
-    isTrue = True if cookie == "True" else False
-    return isTrue
+def get_search(q, page):
+    global logs
+    results = []
 
-def getVerifyCode():
+    # Invidious APIを用いた検索
+    try:
+        t = json.loads(apirequest(fr"api/v1/search?q={urllib.parse.quote(q)}&page={page}&hl=jp"))
+
+        # Invidiousの検索結果
+        for i in t:
+            if i["type"] == "video":
+                results.append({
+                    "title": i["title"],
+                    "id": i["videoId"],
+                    "authorId": i["authorId"],
+                    "author": i["author"],
+                    "length": str(datetime.timedelta(seconds=i["lengthSeconds"])),
+                    "published": i["publishedText"],
+                    "type": "video"
+                })
+            elif i["type"] == "playlist":
+                results.append({
+                    "title": i["title"],
+                    "id": i["playlistId"],
+                    "thumbnail": i["videos"][0]["videoId"],
+                    "count": i["videoCount"],
+                    "type": "playlist"
+                })
+            else:
+                if i["authorThumbnails"][-1]["url"].startswith("https"):
+                    results.append({
+                        "author": i["author"],
+                        "id": i["authorId"],
+                        "thumbnail": i["authorThumbnails"][-1]["url"],
+                        "type": "channel"
+                    })
+                else:
+                    results.append({
+                        "author": i["author"],
+                        "id": i["authorId"],
+                        "thumbnail": "https://" + i["authorThumbnails"][-1]["url"],
+                        "type": "channel"
+                    })
+    
+    except Exception as e:
+        print(f"Invidious APIの呼び出しに失敗しました: {e}")
+        # Googleの検索候補APIを用いた検索
+        google_search_url = f"http://www.google.com/complete/search?client=youtube&hl=ja&ds=yt&q={urllib.parse.quote(q)}"
+        google_results = json.loads(requests.get(google_search_url).text[19:-1])[1]
+
+        # Googleの検索候補結果を結果に追加
+        results += [{"title": suggestion, "type": "suggestion"} for suggestion in google_results]
+
+    return results
+
+def get_channel(channelid):
+    global apichannels
+    t = json.loads(apichannelrequest(r"api/v1/channels/"+ urllib.parse.quote(channelid)))
+    if t["latestVideos"] == []:
+        print("APIがチャンネルを返しませんでした")
+        apichannels.append(apichannels[0])
+        apichannels.remove(apichannels[0])
+        raise APItimeoutError("APIがチャンネルを返しませんでした")
+    return [[{"title":i["title"],"id":i["videoId"],"authorId":t["authorId"],"author":t["author"],"published":i["publishedText"],"type":"video"} for i in t["latestVideos"]],{"channelname":t["author"],"channelicon":t["authorThumbnails"][-1]["url"],"channelprofile":t["descriptionHtml"]}]
+
+def get_playlist(listid,page):
+    t = json.loads(apirequest(r"/api/v1/playlists/"+ urllib.parse.quote(listid)+"?page="+urllib.parse.quote(page)))["videos"]
+    return [{"title":i["title"],"id":i["videoId"],"authorId":i["authorId"],"author":i["author"],"type":"video"} for i in t]
+
+def get_comments(videoid):
+    t = json.loads(apicommentsrequest(r"api/v1/comments/"+ urllib.parse.quote(videoid)+"?hl=jp"))["comments"]
+    return [{"author":i["author"],"authoricon":i["authorThumbnails"][-1]["url"],"authorid":i["authorId"],"body":i["contentHtml"].replace("\n","<br>")} for i in t]
+
+def get_replies(videoid,key):
+    t = json.loads(apicommentsrequest(fr"api/v1/comments/{videoid}?hmac_key={key}&hl=jp&format=html"))["contentHtml"]
+
+def get_level(word):
+    for i1 in range(1,13):
+        with open(f'Level{i1}.txt', 'r', encoding='UTF-8', newline='\n') as f:
+            if word in [i2.rstrip("\r\n") for i2 in f.readlines()]:
+                return i1
+    return 0
+
+
+def check_cokie(cookie):
+    print(cookie)
+    if cookie == "True":
+        return True
+    return False
+
+def get_verifycode():
     try:
         result = subprocess.run(["./yukiverify"], encoding='utf-8', stdout=subprocess.PIPE)
         hashed_password = result.stdout.strip()
         return hashed_password
     except subprocess.CalledProcessError as e:
-        print(f"getVerifyCode__Error: {e}")
+        print(f"Error: {e}")
         return None
 
 
 
+
+
 from fastapi import FastAPI, Depends
-from fastapi import Response, Cookie, Request
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi import Response,Cookie,Request
+from fastapi.responses import HTMLResponse,PlainTextResponse
 from fastapi.responses import RedirectResponse as redirect
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -306,287 +555,276 @@ from typing import Union
 
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
-app.mount("/js", StaticFiles(directory="./statics/js"), name="static")
-app.mount("/css", StaticFiles(directory="./statics/css"), name="static")
-app.mount("/img", StaticFiles(directory="./statics/img"), name="static")
-app.mount("/genesis", StaticFiles(directory="./blog", html=True), name="static")
+app.mount("/css", StaticFiles(directory="./css"), name="static")
+app.mount("/sand", StaticFiles(directory="./blog", html=True), name="static")
+app.mount("/youtube", StaticFiles(directory="./youtube", html=True), name="static")
+app.mount("/ai", StaticFiles(directory="./ai", html=True), name="static")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 from fastapi.templating import Jinja2Templates
 template = Jinja2Templates(directory='templates').TemplateResponse
 
-no_robot_meta_tag = '<meta name="robots" content="noindex,nofollow">'
+
+
+
+
 
 @app.get("/", response_class=HTMLResponse)
-def home(response: Response, request: Request, yuki: Union[str] = Cookie(None)):
-    if checkCookie(yuki):
-        response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-        return template("home.html", {"request": request})
-    print(checkCookie(yuki))
-    return redirect("/genesis")
+def home(response: Response,request: Request,yuki: Union[str] = Cookie(None)):
+    if check_cokie(yuki):
+        response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
+        return template("home.html",{"request": request})
+    print(check_cokie(yuki))
+    return redirect("/sand")
 
-
-@app.get('/watch', response_class=HTMLResponse)
-def video(v:str, response: Response, request: Request, yuki: Union[str] = Cookie(None), proxy: Union[str] = Cookie(None)):
-    # v: video_id
-    if not(checkCookie(yuki)):
+@app.get("/search", response_class=HTMLResponse,)
+def search(q:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None),proxy: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    response.set_cookie(key="yuki", value="True", max_age=7*24*60*60)
-    video_data = getVideoData(v)
-    '''
-    return [
-        {
-            'video_urls': list(reversed([i["url"] for i in t["formatStreams"]]))[:2],
-            'description_html': t["descriptionHtml"].replace("\n", "<br>"),
-            'title': t["title"],
-            'length_text': str(datetime.timedelta(seconds=t["lengthSeconds"]))
-            'author_id': t["authorId"],
-            'author': t["author"],
-            'author_thumbnails_url': t["authorThumbnails"][-1]["url"],
-            'view_count': t["viewCount"],
-            'like_count': t["likeCount"],
-            'subscribers_count': t["subCountText"]
-        },
-        [
-            {
-                "video_id": i["videoId"],
-                "title": i["title"],
-                "author_id": i["authorId"],
-                "author": i["author"],
-                "length_text": str(datetime.timedelta(seconds=i["lengthSeconds"])),
-                "view_count_text": i["viewCountText"]
-            } for i in recommended_videos
-        ]
-    ]
-    '''
-    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-    return template('video.html', {
-        "request": request,
-        "videoid": v,
-        "videourls": video_data[0]['video_urls'],
-        "description": video_data[0]['description_html'],
-        "video_title": video_data[0]['title'],
-        "author_id": video_data[0]['author_id'],
-        "author_icon": video_data[0]['author_thumbnails_url'],
-        "author": video_data[0]['author'],
-        "length_text": video_data[0]['length_text'],
-        "view_count": video_data[0]['view_count'],
-        "like_count": video_data[0]['like_count'],
-        "subscribers_count": video_data[0]['subscribers_count'],
-        "recommended_videos": video_data[1],
-        "proxy":proxy
-    })
-
-@app.get("/search", response_class=HTMLResponse)
-def search(q:str, response: Response, request: Request, page:Union[int, None]=1, yuki: Union[str] = Cookie(None), proxy: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
-        return redirect("/")
-    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-    return template("search.html", {"request": request, "results":getSearchData(q, page), "word":q, "next":f"/search?q={q}&page={page + 1}", "proxy":proxy})
+    response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
+    return template("search.html", {"request": request,"results":get_search(q,page),"word":q,"next":f"/search?q={q}&page={page + 1}","proxy":proxy})
 
 @app.get("/hashtag/{tag}")
-def search(tag:str, response: Response, request: Request, page:Union[int, None]=1, yuki: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+def search(tag:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
     return redirect(f"/search?q={tag}")
 
+
 @app.get("/channel/{channelid}", response_class=HTMLResponse)
-def channel(channelid:str, response: Response, request: Request, yuki: Union[str] = Cookie(None), proxy: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+def channel(channelid:str,response: Response,request: Request,yuki: Union[str] = Cookie(None),proxy: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-    t = getChannelData(channelid)
-    return template("channel.html", {"request": request, "results": t[0], "channel_name": t[1]["channel_name"], "channel_icon": t[1]["channel_icon"], "channel_profile": t[1]["channel_profile"], "cover_img_url": t[1]["author_banner"], "subscribers_count": t[1]["subscribers_count"], "proxy": proxy})
+    response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
+    t = get_channel(channelid)
+    return template("channel.html", {"request": request,"results":t[0],"channelname":t[1]["channelname"],"channelicon":t[1]["channelicon"],"channelprofile":t[1]["channelprofile"],"proxy":proxy})
+
+@app.get("/answer", response_class=HTMLResponse)
+def set_cokie(q:str):
+    t = get_level(q)
+    if t > 5:
+        return f"level{t}\n推測を推奨する"
+    elif t == 0:
+        return "level12以上\nほぼ推測必須"
+    return f"level{t}\n覚えておきたいレベル"
 
 @app.get("/playlist", response_class=HTMLResponse)
-def playlist(list:str, response: Response, request: Request, page:Union[int, None]=1, yuki: Union[str] = Cookie(None), proxy: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+def playlist(list:str,response: Response,request: Request,page:Union[int,None]=1,yuki: Union[str] = Cookie(None),proxy: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-    return template("search.html", {"request": request, "results": getPlaylistData(list, str(page)), "word": "", "next": f"/playlist?list={list}", "proxy": proxy})
+    response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
+    return template("search.html", {"request": request,"results":get_playlist(list,str(page)),"word":"","next":f"/playlist?list={list}","proxy":proxy})
 
-@app.get("/comments")
-def comments(request: Request, v:str):
-    return template("comments.html", {"request": request, "comments": getCommentsData(v)})
-
-@app.get("/thumbnail")
-def thumbnail(v:str):
-    return Response(content = requests.get(f"https://img.youtube.com/vi/{v}/0.jpg").content, media_type=r"image/jpeg")
+@app.get("/info", response_class=HTMLResponse)
+def viewlist(response: Response,request: Request,yuki: Union[str] = Cookie(None)):
+    global apis,apichannels,apicomments
+    if not(check_cokie(yuki)):
+        return redirect("/")
+    response.set_cookie("yuki","True",max_age=60 * 60 * 24 * 7)
+    return template("info.html",{"request": request,"Youtube_API":apis[0],"Channel_API":apichannels[0],"Comments_API":apicomments[0]})
 
 @app.get("/suggest")
 def suggest(keyword:str):
-    return [i[0] for i in json.loads(requests.get("http://www.google.com/complete/search?client=youtube&hl=ja&ds=yt&q=" + urllib.parse.quote(keyword), headers=getRandomUserAgent()).text[19:-1])[1]]
+    return [i[0] for i in json.loads(requests.get(r"http://www.google.com/complete/search?client=youtube&hl=ja&ds=yt&q="+urllib.parse.quote(keyword)).text[19:-1])[1]]
 
+@app.get("/comments")
+def comments(request: Request,v:str):
+    return template("comments.html",{"request": request,"comments":get_comments(v)})
 
+@app.get("/thumbnail")
+def thumbnail(v:str):
+    return Response(content = requests.get(fr"https://img.youtube.com/vi/{v}/0.jpg").content,media_type=r"image/jpeg")
 
-
-
-@cache(seconds=120)
-def getSource(name):
-    return requests.get(f'https://raw.githubusercontent.com/LunaKamituki/yuki-source/refs/heads/main/{name}.html', headers=getRandomUserAgent()).text
-
-@app.get("/bbs", response_class=HTMLResponse)
-def bbs(request: Request, name: Union[str, None] = "", seed:Union[str, None]="", channel:Union[str, None]="main", verify:Union[str, None]="false", yuki: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+@app.get("/bbs",response_class=HTMLResponse)
+def view_bbs(request: Request,name: Union[str, None] = "",seed:Union[str,None]="",channel:Union[str,None]="main",verify:Union[str,None]="false",yuki: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    res = HTMLResponse(no_robot_meta_tag + requests.get(f"{url}bbs?name={urllib.parse.quote(name)}&seed={urllib.parse.quote(seed)}&channel={urllib.parse.quote(channel)}&verify={urllib.parse.quote(verify)}", cookies={"yuki":"True"}).text.replace('AutoLink(xhr.responseText);', 'urlConvertToLink(xhr.responseText);') + getSource('bbs'))
+    res = HTMLResponse(requests.get(fr"{url}bbs?name={urllib.parse.quote(name)}&seed={urllib.parse.quote(seed)}&channel={urllib.parse.quote(channel)}&verify={urllib.parse.quote(verify)}",cookies={"yuki":"True"}).text)
     return res
 
 @cache(seconds=5)
-def getCachedBBSAPI(verify, channel):
-    return requests.get(f"{url}bbs/api?t={urllib.parse.quote(str(int(time.time()*1000)))}&verify={urllib.parse.quote(verify)}&channel={urllib.parse.quote(channel)}", cookies={"yuki":"True"}).text
+def bbsapi_cached(verify,channel):
+    return requests.get(fr"{url}bbs/api?t={urllib.parse.quote(str(int(time.time()*1000)))}&verify={urllib.parse.quote(verify)}&channel={urllib.parse.quote(channel)}",cookies={"yuki":"True"}).text
 
-@app.get("/bbs/api", response_class=HTMLResponse)
-def bbsAPI(request: Request, t: str, channel:Union[str, None]="main", verify: Union[str, None] = "false"):
-    return getCachedBBSAPI(verify, channel)
+@app.get("/bbs/api",response_class=HTMLResponse)
+def view_bbs(request: Request,t: str,channel:Union[str,None]="main",verify: Union[str,None] = "false"):
+    print(fr"{url}bbs/api?t={urllib.parse.quote(t)}&verify={urllib.parse.quote(verify)}&channel={urllib.parse.quote(channel)}")
+    return bbsapi_cached(verify,channel)
 
 @app.get("/bbs/result")
-def write_bbs(request: Request, name: str = "", message: str = "", seed:Union[str, None] = "", channel:Union[str, None]="main", verify:Union[str, None]="false", yuki: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+def write_bbs(request: Request,name: str = "",message: str = "",seed:Union[str,None] = "",channel:Union[str,None]="main",verify:Union[str,None]="false",yuki: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    if 'Google-Apps-Script' in str(request.scope["headers"][1][1]):
-        raise UnallowedBot("GASのBotは許可されていません")
-      
-    params = {
-      'name': urllib.parse.quote(name),
-      'message': urllib.parse.quote(message),
-      'seed': urllib.parse.quote(seed),
-      'channel': urllib.parse.quote(channel),
-      'verify': urllib.parse.quote(verify),
-      'info': urllib.parse.quote(getInfo(request)),
-      'serververify': getVerifyCode()
-    }
-  
-    url_querys = ''
-    for key, value in params.items():
-      url_querys += f'{key}={value}&'
-
-    if url_querys != '':
-      url_querys = '?' + url_querys[:-1]
-      
-    t = requests.get(f"{url}bbs/result" + url_querys, cookies={"yuki": "True"}, allow_redirects=False)
+    t = requests.get(fr"{url}bbs/result?name={urllib.parse.quote(name)}&message={urllib.parse.quote(message)}&seed={urllib.parse.quote(seed)}&channel={urllib.parse.quote(channel)}&verify={urllib.parse.quote(verify)}&info={urllib.parse.quote(get_info(request))}&serververify={get_verifycode()}",cookies={"yuki":"True"}, allow_redirects=False)
     if t.status_code != 307:
-        return HTMLResponse(no_robot_meta_tag + t.text.replace('AutoLink(xhr.responseText);', 'urlConvertToLink(xhr.responseText);') + getSource('bbs'))
-        
+        return HTMLResponse(t.text)
     return redirect(f"/bbs?name={urllib.parse.quote(name)}&seed={urllib.parse.quote(seed)}&channel={urllib.parse.quote(channel)}&verify={urllib.parse.quote(verify)}")
 
-@cache(seconds=120)
-def getCachedBBSHow():
-    return requests.get(f"{url}bbs/how").text
+@cache(seconds=30)
+def how_cached():
+    return requests.get(fr"{url}bbs/how").text
 
-@app.get("/bbs/how", response_class=PlainTextResponse)
-def view_commonds(request: Request, yuki: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
+@app.get("/bbs/how",response_class=PlainTextResponse)
+def view_commonds(request: Request,yuki: Union[str] = Cookie(None)):
+    if not(check_cokie(yuki)):
         return redirect("/")
-    return getCachedBBSHow()
+    return how_cached()
 
-
-
-@app.get("/info", response_class=HTMLResponse)
-def viewlist(response: Response, request: Request, yuki: Union[str] = Cookie(None)):
-    if not(checkCookie(yuki)):
-        return redirect("/")
-    response.set_cookie("yuki", "True", max_age=60 * 60 * 24 * 7)
-    
-    return template("info.html", {"request": request, "Youtube_API": invidious_api.video[0], "Channel_API": invidious_api.channel[0], "comments": invidious_api.comments[0]})
-
-@app.get("/reset", response_class=PlainTextResponse)
+@app.get("/load_instance")
 def home():
-    global url, invidious_api
-    url = requests.get('https://raw.githubusercontent.com/yuto1106110/yuto-yuki-youtube-1/main/APItati', headers=getRandomUserAgent()).text.rstrip()
-    invidious_api = InvidiousAPI()
-    return 'Success'
+    global url
+    url = requests.get(r'https://raw.githubusercontent.com/mochidukiyukimi/yuki-youtube-instance/main/instance.txt').text.rstrip()
 
-@app.get("/version", response_class=PlainTextResponse)
-def displayVersion():
-    return str({'version': version, 'new_instance_version': new_instance_version})
-
-@app.get("/api/update", response_class=PlainTextResponse)
-def updateAllAPI():
-  global invidious_api
-  return str((invidious_api := InvidiousAPI()).info())
-
-@app.get("/api/{api_name}", response_class=PlainTextResponse)
-def displayAPI(api_name: str):
-  
-  match api_name:
-    case 'all':
-      api_value = invidious_api.info()
-        
-    case 'video':
-      api_value = invidious_api.video
-  
-    case 'search':
-      api_value = invidious_api.search
-  
-    case 'channel':
-      api_value = invidious_api.channel
-  
-    case 'comments':
-      api_value = invidious_api.comments
-
-    case 'playlist':
-      api_value = invidious_api.playlist
-      
-    case _:
-      api_value = f'API Name Error: {api_name}'
-        
-  return str(api_value)
-    
-
-@app.get("/api/{api_name}/next", response_class=PlainTextResponse)
-def rotateAPI(api_name: str):
-  match api_name:
-    case 'video':
-      updateList(invidious_api.video, invidious_api.video[0])
-  
-    case 'search':
-      updateList(invidious_api.search, invidious_api.search[0])
-  
-    case 'channel':
-      updateList(invidious_api.channel, invidious_api.channel[0])
-  
-    case 'comments':
-      updateList(invidious_api.comments, invidious_api.comments[0])
-
-    case 'playlist':
-      updateList(invidious_api.playlist, invidious_api.playlist[0])
-
-    case _:
-      return f'API Name Error: {api_name}'
-        
-  return 'Finish'
-    
-@app.get("/api/video/check", response_class=PlainTextResponse)
-def displayCheckVideo():
-    return str(invidious_api.check_video)
-
-@app.get("/api/video/check/toggle", response_class=PlainTextResponse)
-def toggleVideoCheck():
-    global invidious_api
-    invidious_api.check_video = not invidious_api.check_video
-    return f'{not invidious_api.check_video} to {invidious_api.check_video}'
-  
-@app.get("/shadow", response_class=HTMLResponse)
+@app.get("/list", response_class=HTMLResponse)
 def list_page(response: Response, request: Request):
-    return template("shadow.html", {"request": request})
-      
-@app.get("/rammerhead", response_class=HTMLResponse)
-def list_page(response: Response, request: Request):
-    return template("rammerhead.html", {"request": request})
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にurllists.htmlを返す
+    return template("urllists.html", {"request": request})
+
 @app.get("/chat", response_class=HTMLResponse)
 def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
     return template("chat.html", {"request": request})
 
+@app.get("/byeschool", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
+    return template("bye.html", {"request": request})
 
+@app.get("/justvideo", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
+    return template("justvideo.html", {"request": request})
+
+@app.get("/deploy", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
+    return template("deploy.html", {"request": request})
+
+@app.get("/shadow", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
+    return template("shadow.html", {"request": request})
+
+@app.get("/static", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    # Cookieのチェックをしないため、承諾していない場合でもアクセス可能
+    # 必要に応じてデータを取得
+    # ここでは単純にhtmlを返す
+    return template("iframe.html", {"request": request})
+
+@app.get("/health", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    return template("health.html", {"request": request})
+
+@app.get("/tell", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    return template("tell.html", {"request": request})
+
+@app.get("/instance", response_class=HTMLResponse)
+def list_page(response: Response, request: Request):
+    return template("instance.html", {"request": request})
+
+    
 @app.exception_handler(500)
-def error500(request: Request, __):
-    return template("error.html", {"request": request, "context": '500 Internal Server Error'}, status_code=500)
+def page(request: Request,__):
+    return template("APIwait.html",{"request": request},status_code=500)
 
-@app.exception_handler(APITimeoutError)
-def apiWait(request: Request, exception: APITimeoutError):
-    return template("apiTimeout.html", {"request": request}, status_code=504)
+@app.exception_handler(APItimeoutError)
+def APIwait(request: Request,exception: APItimeoutError):
+    return template("APIwait.html",{"request": request},status_code=500)
 
-@app.exception_handler(UnallowedBot)
-def returnToUnallowedBot(request: Request, exception: UnallowedBot):
-    return template("error.html", {"request": request, "context": '403 Forbidden'}, status_code=403)
+g_videoid = None
+
+@app.get('/watch', response_class=HTMLResponse)
+def video(
+    v: str, 
+    response: Response, 
+    request: Request, 
+    yuki: Union[str] = Cookie(None), 
+    proxy: Union[str] = Cookie(None)
+):
+    global g_videoid  # グローバル変数を使用するために宣言
+
+    # クッキーの確認
+    if not check_cokie(yuki):
+        return redirect("/")
+    
+    # クッキーをセット
+    response.set_cookie(key="yuki", value="True", max_age=7*24*60*60)
+
+    # 動画IDを取得し、videoidとg_videoidに代入
+    videoid = v
+    g_videoid = videoid  # グローバル変数に代入
+
+    # データを取得
+    t = get_data(videoid)
+
+    # 再度クッキーをセット
+    response.set_cookie(key="yuki", value="True", max_age=60 * 60 * 24 * 7)
+
+    # テンプレートに g_videoid を渡す
+    return template('video.html', {
+        "request": request,
+        "videoid": videoid,
+        "g_videoid": g_videoid,  # ここで g_videoid をテンプレートに渡す
+        "videourls": t[1],
+        "res": t[0],
+        "description": t[2],
+        "videotitle": t[3],
+        "authorid": t[4],
+        "authoricon": t[6],
+        "author": t[5],
+        "proxy": proxy
+    })
+
+# 新しい変数をteigiした
+max_stream_api_wait_time = 7  # ストリームAPIリクエストの最大待機時間
+
+@app.get('/watch/{v}/stream', response_class=HTMLResponse)
+def stream(
+    v: str, 
+    response: Response, 
+    request: Request
+):
+    stream_url = None
+    start_time = time.time()  # リクエスト開始時刻を記録
+
+    # タイムアウト処理を考慮してループ
+    while True:
+        try:
+            api_response = requests.get(f"https://new-era-hack.vercel.app/api/sand-smoke/stream/{urllib.parse.quote(v)}", timeout=max_stream_api_wait_time)
+            
+            if api_response.status_code == 200:
+                # ストリームURLを取得
+                data = api_response.json()
+                stream_url = data.get("stream_url")
+                break  # 成功したらループを抜ける
+            else:
+                print(f"APIエラー: ステータスコード {api_response.status_code}")
+        except requests.Timeout:
+            print("タイムアウトが発生しました")
+            if time.time() - start_time >= max_stream_api_wait_time:
+                # 最大待機時間を超えた場合はAPItimeoutErrorを発生させる
+                raise APItimeoutError("ストリームAPIがタイムアウトしました")
+        except Exception as e:
+            print(f"ストリームURLの取得中にエラーが発生しました: {e}")
+            break  # それ以外のエラーが発生した場合はループを抜ける
+
+    # テンプレートにストリームURLを渡す
+    return template('stream.html', {
+        "request": request,
+        "videoid": v,
+        "stream_url": stream_url  # ストリームURLをテンプレートに渡す
+    })
